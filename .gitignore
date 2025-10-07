@@ -1,0 +1,14 @@
+# Virtual Environment
+venv/
+env/
+.venv/
+.env/
+
+# Environment Variables
+.env
+.DS_Store
+
+# Generated Data (recreated by scripts)
+simple_wikipedia/
+chroma_db/
+results/

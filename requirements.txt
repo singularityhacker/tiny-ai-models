@@ -1,0 +1,8 @@
+lm-eval
+transformers
+torch
+huggingface_hub
+datasets
+sentence-transformers
+chromadb
+tqdm

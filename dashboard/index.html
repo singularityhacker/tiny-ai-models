@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiny AI Models - Evaluation Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .controls {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        select, input {
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            transition: transform 0.3s;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .metric-card h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .metric-card .value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .metric-card .subtitle {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .chart-container h3 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+            font-size: 1.3rem;
+        }
+
+        .detailed-results {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .detailed-results h3 {
+            background: #f8f9fa;
+            padding: 20px 25px;
+            margin: 0;
+            color: #2c3e50;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .results-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            position: sticky;
+            top: 0;
+        }
+
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s;
+            position: relative;
+        }
+
+        .sortable:hover {
+            background: #e9ecef;
+        }
+
+        .sort-arrow {
+            font-size: 0.8em;
+            margin-left: 5px;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+
+        .sortable:hover .sort-arrow {
+            opacity: 1;
+        }
+
+        .sort-arrow.active {
+            opacity: 1;
+            color: #667eea;
+        }
+
+        .sort-arrow.asc::after {
+            content: "↑";
+        }
+
+        .sort-arrow.desc::after {
+            content: "↓";
+        }
+
+        .results-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .accuracy-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .accuracy-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #e74c3c 0%, #f39c12 50%, #27ae60 100%);
+            transition: width 0.3s ease;
+        }
+
+        .accuracy-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+
+        .comparison-mode {
+            display: none;
+        }
+
+        .comparison-mode.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .control-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Tiny AI Models Dashboard</h1>
+            <p>Visualize and compare evaluation results across different model runs</p>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="modelSelect">Model:</label>
+                <select id="modelSelect">
+                    <option value="">Loading models...</option>
+                </select>
+
+                <label for="runSelect">Evaluation Run:</label>
+                <select id="runSelect">
+                    <option value="">Select a run...</option>
+                </select>
+
+                <label>
+                    <input type="checkbox" id="comparisonMode"> Comparison Mode
+                </label>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div id="loading" class="loading">
+                <p>Loading evaluation results...</p>
+            </div>
+
+            <div id="error" class="error" style="display: none;"></div>
+
+            <div id="dashboard" style="display: none;">
+                <!-- Key Metrics -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <h3>Overall Accuracy</h3>
+                        <div class="value" id="overallAccuracy">-</div>
+                        <div class="subtitle">across all tasks</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>HellaSwag Score</h3>
+                        <div class="value" id="hellaswagScore">-</div>
+                        <div class="subtitle">commonsense reasoning</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>MMLU Score</h3>
+                        <div class="value" id="mmluScore">-</div>
+                        <div class="subtitle">multitask understanding</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Questions Evaluated</h3>
+                        <div class="value" id="totalQuestions">-</div>
+                        <div class="subtitle" id="questionsSubtitle">total across all tests</div>
+                        <div class="question-breakdown" id="questionBreakdown" style="font-size: 0.8rem; margin-top: 8px; opacity: 0.9;"></div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Test Duration</h3>
+                        <div class="value" id="testDuration">-</div>
+                        <div class="subtitle" id="durationSubtitle">total time</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Test Date</h3>
+                        <div class="value" id="testDate">-</div>
+                        <div class="subtitle">last evaluation</div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-section">
+                    <div class="chart-container">
+                        <h3>Task Performance Overview</h3>
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>MMLU Subject Breakdown</h3>
+                        <canvas id="mmluBreakdownChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Detailed Results Table -->
+                <div class="detailed-results">
+                    <h3>Detailed Results</h3>
+                    <table class="results-table" id="resultsTable">
+                        <thead>
+                            <tr>
+                                <th class="sortable" data-sort="task">
+                                    Task <span class="sort-arrow">↕</span>
+                                </th>
+                                <th class="sortable" data-sort="accuracy">
+                                    Accuracy <span class="sort-arrow">↕</span>
+                                </th>
+                                <th class="sortable" data-sort="error">
+                                    Error <span class="sort-arrow">↕</span>
+                                </th>
+                                <th>Visual</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Comparison Mode -->
+                <div id="comparisonSection" class="comparison-mode">
+                    <h3>Run Comparison</h3>
+                    <div id="comparisonContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class EvaluationDashboard {
+            constructor() {
+                this.data = {};
+                this.currentRun = null;
+                this.charts = {};
+                this.currentSort = { column: null, direction: null };
+                this.tableData = [];
+                this.initializeEventListeners();
+                this.loadResults();
+            }
+
+            initializeEventListeners() {
+                document.getElementById('modelSelect').addEventListener('change', () => this.onModelChange());
+                document.getElementById('runSelect').addEventListener('change', () => this.onRunChange());
+                document.getElementById('comparisonMode').addEventListener('change', (e) => this.toggleComparisonMode(e.target.checked));
+                
+                // Add sorting event listeners
+                document.querySelectorAll('.sortable').forEach(th => {
+                    th.addEventListener('click', () => this.handleSort(th.dataset.sort));
+                });
+            }
+
+            async loadResults() {
+                try {
+                    // In a real implementation, this would fetch from a server
+                    // For now, we'll simulate loading the available results
+                    const models = await this.getAvailableModels();
+                    this.populateModelSelect(models);
+                } catch (error) {
+                    this.showError('Failed to load results: ' + error.message);
+                }
+            }
+
+            async getAvailableModels() {
+                const response = await fetch('/api/models');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return await response.json();
+            }
+
+            populateModelSelect(models) {
+                const select = document.getElementById('modelSelect');
+                select.innerHTML = '<option value="">Select a model...</option>';
+                
+                models.forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model.id;
+                    option.textContent = model.name;
+                    select.appendChild(option);
+                });
+            }
+
+            async onModelChange() {
+                const modelId = document.getElementById('modelSelect').value;
+                if (!modelId) return;
+
+                try {
+                    const runs = await this.getModelRuns(modelId);
+                    this.populateRunSelect(runs);
+                } catch (error) {
+                    this.showError('Failed to load runs: ' + error.message);
+                }
+            }
+
+            populateRunSelect(runs) {
+                const select = document.getElementById('runSelect');
+                select.innerHTML = '<option value="">Select a run...</option>';
+                
+                runs.forEach(run => {
+                    const option = document.createElement('option');
+                    option.value = run.id;
+                    
+                    // Format timestamp safely
+                    let timestampStr = run.timestamp;
+                    try {
+                        const timestamp = new Date(run.timestamp);
+                        if (!isNaN(timestamp.getTime())) {
+                            timestampStr = timestamp.toLocaleString();
+                        }
+                    } catch (e) {
+                        // Keep original timestamp if parsing fails
+                        console.warn('Failed to parse timestamp:', run.timestamp);
+                    }
+                    
+                    option.textContent = `${run.label} - ${timestampStr}`;
+                    select.appendChild(option);
+                });
+            }
+
+            async onRunChange() {
+                const runId = document.getElementById('runSelect').value;
+                if (!runId) return;
+
+                try {
+                    const data = await this.loadRunData(runId);
+                    this.currentRun = { id: runId, data };
+                    this.renderDashboard(data);
+                } catch (error) {
+                    this.showError('Failed to load run data: ' + error.message);
+                }
+            }
+
+            async getModelRuns(modelId) {
+                const response = await fetch(`/api/runs?model_id=${encodeURIComponent(modelId)}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return await response.json();
+            }
+
+            async loadRunData(runId) {
+                const response = await fetch(`/api/data/${encodeURIComponent(runId)}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return await response.json();
+            }
+
+            renderDashboard(data) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+
+                this.updateMetrics(data);
+                this.createCharts(data);
+                this.populateTable(data);
+            }
+
+            updateMetrics(data) {
+                const results = data.results;
+                
+                // Calculate overall accuracy
+                const accuracies = Object.values(results)
+                    .filter(r => r['acc,none'] !== undefined)
+                    .map(r => r['acc,none']);
+                const overallAccuracy = accuracies.reduce((a, b) => a + b, 0) / accuracies.length;
+
+                document.getElementById('overallAccuracy').textContent = (overallAccuracy * 100).toFixed(1) + '%';
+                document.getElementById('hellaswagScore').textContent = (results.hellaswag['acc,none'] * 100).toFixed(1) + '%';
+                document.getElementById('mmluScore').textContent = (results.mmlu['acc,none'] * 100).toFixed(1) + '%';
+                
+                // Calculate total questions and breakdown
+                const questionData = this.calculateQuestionBreakdown(data);
+                document.getElementById('totalQuestions').textContent = questionData.total.toLocaleString();
+                
+                // Update subtitle based on whether it's a limited test
+                const isLimitedTest = data.config && data.config.limit && data.config.limit < 1000;
+                document.getElementById('questionsSubtitle').textContent = isLimitedTest ? 'limited test' : 'full evaluation';
+                
+                // Show breakdown
+                document.getElementById('questionBreakdown').innerHTML = questionData.breakdown;
+                
+                // Display test duration
+                const duration = this.formatDuration(data);
+                document.getElementById('testDuration').textContent = duration.value;
+                document.getElementById('durationSubtitle').textContent = duration.unit;
+                
+                // Extract date from run ID
+                const runId = this.currentRun.id;
+                const dateMatch = runId.match(/(\d{4}-\d{2}-\d{2})/);
+                const date = dateMatch ? dateMatch[1] : 'Unknown';
+                document.getElementById('testDate').textContent = date;
+            }
+
+            calculateQuestionBreakdown(data) {
+                // Estimate total questions based on config limit and number of tasks
+                const config = data.config || {};
+                const limit = config.limit;
+                const results = data.results || {};
+                
+                // Count main tasks (hellaswag, mmlu)
+                const mainTasks = Object.keys(results).filter(key => 
+                    key === 'hellaswag' || key === 'mmlu'
+                );
+                
+                // Calculate questions per test
+                let hellaswagQuestions = 0;
+                let mmluQuestions = 0;
+                
+                if (limit && limit < 1000) {
+                    // Limited test - use the limit value per task
+                    if (results.hellaswag) hellaswagQuestions = Math.round(limit);
+                    if (results.mmlu) mmluQuestions = Math.round(limit);
+                } else {
+                    // Full evaluation - use actual dataset sizes
+                    if (results.hellaswag) hellaswagQuestions = 10042;
+                    if (results.mmlu) mmluQuestions = 15908;
+                }
+                
+                const total = hellaswagQuestions + mmluQuestions;
+                const breakdown = `
+                    ${hellaswagQuestions > 0 ? `HellaSwag: ${hellaswagQuestions.toLocaleString()}<br>` : ''}
+                    ${mmluQuestions > 0 ? `MMLU: ${mmluQuestions.toLocaleString()}` : ''}
+                `;
+                
+                return {
+                    total: total,
+                    breakdown: breakdown.trim()
+                };
+            }
+
+            formatDuration(data) {
+                // The duration is stored at the root level, not in config
+                const durationSeconds = parseFloat(data.total_evaluation_time_seconds || 0);
+                
+                if (durationSeconds === 0) {
+                    return { value: 'N/A', unit: '' };
+                } else if (durationSeconds < 60) {
+                    return { value: durationSeconds.toFixed(0), unit: 'seconds' };
+                } else if (durationSeconds < 3600) {
+                    return { value: (durationSeconds / 60).toFixed(1), unit: 'minutes' };
+                } else {
+                    return { value: (durationSeconds / 3600).toFixed(1), unit: 'hours' };
+                }
+            }
+
+            createCharts(data) {
+                this.createPerformanceChart(data);
+                this.createMMLUBreakdownChart(data);
+            }
+
+            createPerformanceChart(data) {
+                const ctx = document.getElementById('performanceChart').getContext('2d');
+                
+                if (this.charts.performance) {
+                    this.charts.performance.destroy();
+                }
+
+                const results = data.results;
+                const mainTasks = ['hellaswag', 'mmlu'];
+                
+                this.charts.performance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['HellaSwag', 'MMLU'],
+                        datasets: [{
+                            label: 'Accuracy (%)',
+                            data: mainTasks.map(task => (results[task]['acc,none'] * 100).toFixed(1)),
+                            backgroundColor: [
+                                'rgba(102, 126, 234, 0.8)',
+                                'rgba(118, 75, 162, 0.8)'
+                            ],
+                            borderColor: [
+                                'rgba(102, 126, 234, 1)',
+                                'rgba(118, 75, 162, 1)'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%';
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+
+            createMMLUBreakdownChart(data) {
+                const ctx = document.getElementById('mmluBreakdownChart').getContext('2d');
+                
+                if (this.charts.mmluBreakdown) {
+                    this.charts.mmluBreakdown.destroy();
+                }
+
+                const results = data.results;
+                const mmluSubjects = Object.keys(results)
+                    .filter(key => key.startsWith('mmlu_') && key !== 'mmlu')
+                    .map(key => ({
+                        name: results[key].alias.replace(/^\s*-\s*/, '').replace(/_/g, ' '),
+                        accuracy: results[key]['acc,none']
+                    }));
+
+                this.charts.mmluBreakdown = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: mmluSubjects.map(s => s.name),
+                        datasets: [{
+                            data: mmluSubjects.map(s => (s.accuracy * 100).toFixed(1)),
+                            backgroundColor: [
+                                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                                '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF',
+                                '#4BC0C0', '#FF6384', '#36A2EB'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 20,
+                                    usePointStyle: true
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            populateTable(data) {
+                // Store the data for sorting
+                this.tableData = [];
+                Object.entries(data.results).forEach(([taskKey, result]) => {
+                    if (result['acc,none'] === undefined) return;
+                    
+                    this.tableData.push({
+                        task: result.alias || taskKey,
+                        taskKey: taskKey,
+                        accuracy: result['acc,none'],
+                        error: result['acc_stderr,none'] || 0
+                    });
+                });
+
+                this.renderTable();
+            }
+
+            renderTable() {
+                const tbody = document.getElementById('resultsTableBody');
+                tbody.innerHTML = '';
+
+                this.tableData.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.task}</td>
+                        <td>${(item.accuracy * 100).toFixed(2)}%</td>
+                        <td>±${(item.error * 100).toFixed(2)}%</td>
+                        <td>
+                            <div class="accuracy-bar">
+                                <div class="accuracy-fill" style="width: ${item.accuracy * 100}%"></div>
+                                <div class="accuracy-text">${(item.accuracy * 100).toFixed(1)}%</div>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            handleSort(column) {
+                // Determine sort direction
+                let direction = 'asc';
+                if (this.currentSort.column === column && this.currentSort.direction === 'asc') {
+                    direction = 'desc';
+                }
+
+                // Update current sort
+                this.currentSort = { column, direction };
+
+                // Update sort indicators
+                this.updateSortIndicators();
+
+                // Sort the data
+                this.tableData.sort((a, b) => {
+                    let aVal, bVal;
+                    
+                    switch (column) {
+                        case 'task':
+                            aVal = a.task.toLowerCase();
+                            bVal = b.task.toLowerCase();
+                            break;
+                        case 'accuracy':
+                            aVal = a.accuracy;
+                            bVal = b.accuracy;
+                            break;
+                        case 'error':
+                            aVal = a.error;
+                            bVal = b.error;
+                            break;
+                        default:
+                            return 0;
+                    }
+
+                    if (direction === 'asc') {
+                        return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+                    } else {
+                        return aVal < bVal ? 1 : aVal > bVal ? -1 : 0;
+                    }
+                });
+
+                // Re-render the table
+                this.renderTable();
+            }
+
+            updateSortIndicators() {
+                // Reset all sort indicators
+                document.querySelectorAll('.sort-arrow').forEach(arrow => {
+                    arrow.className = 'sort-arrow';
+                });
+
+                // Set active indicator
+                if (this.currentSort.column) {
+                    const activeHeader = document.querySelector(`[data-sort="${this.currentSort.column}"] .sort-arrow`);
+                    if (activeHeader) {
+                        activeHeader.className = `sort-arrow active ${this.currentSort.direction}`;
+                    }
+                }
+            }
+
+            toggleComparisonMode(enabled) {
+                const comparisonSection = document.getElementById('comparisonSection');
+                if (enabled) {
+                    comparisonSection.classList.add('active');
+                    // In a real implementation, this would load comparison data
+                } else {
+                    comparisonSection.classList.remove('active');
+                }
+            }
+
+            showError(message) {
+                const errorDiv = document.getElementById('error');
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new EvaluationDashboard();
+        });
+    </script>
+</body>
+</html>
