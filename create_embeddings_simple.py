@@ -45,11 +45,13 @@ def main():
     dataset = load_dataset("wikipedia", "20220301.simple")
     train_data = dataset['train']
     
-    # Process first 100 articles only for testing
-    num_articles = min(100, len(train_data))
-    print(f"📊 Processing first {num_articles:,} articles...")
+    # Process all articles
+    num_articles = len(train_data)
+    print(f"📊 Processing all {num_articles:,} articles...")
     
     total_chunks = 0
+    processed_articles = 0
+    skipped_articles = 0
     
     for i in tqdm(range(num_articles), desc="Processing articles"):
         article = train_data[i]
@@ -69,39 +71,51 @@ def main():
                 })
         
         if chunks:
-            # Create embeddings for this article's chunks
-            texts = [chunk['text'] for chunk in chunks]
-            embeddings = model.encode(texts, show_progress_bar=False)
-            
-            # Prepare data for ChromaDB
-            ids = []
-            documents = []
-            metadatas = []
-            
-            for j, chunk in enumerate(chunks):
-                chunk_id = f"{title.replace(' ', '_')}_{j}"
-                ids.append(chunk_id)
-                documents.append(chunk['text'])
-                metadatas.append({
-                    'title': title,
-                    'chunk_id': j,
-                    'article_index': i
-                })
-            
-            # Store in ChromaDB
-            collection.add(
-                ids=ids,
-                embeddings=embeddings.tolist(),
-                documents=documents,
-                metadatas=metadatas
-            )
-            
-            total_chunks += len(chunks)
+            try:
+                # Create embeddings for this article's chunks
+                texts = [chunk['text'] for chunk in chunks]
+                embeddings = model.encode(texts, show_progress_bar=False)
+                
+                # Prepare data for ChromaDB
+                ids = []
+                documents = []
+                metadatas = []
+                
+                for j, chunk in enumerate(chunks):
+                    chunk_id = f"{title.replace(' ', '_')}_{j}"
+                    ids.append(chunk_id)
+                    documents.append(chunk['text'])
+                    metadatas.append({
+                        'title': title,
+                        'chunk_id': j,
+                        'article_index': i
+                    })
+                
+                # Store in ChromaDB
+                collection.add(
+                    ids=ids,
+                    embeddings=embeddings.tolist(),
+                    documents=documents,
+                    metadatas=metadatas
+                )
+                
+                total_chunks += len(chunks)
+                processed_articles += 1
+                
+            except Exception as e:
+                print(f"\n⚠️  Error processing article '{title}': {e}")
+                skipped_articles += 1
+                continue
+        else:
+            skipped_articles += 1
     
     print(f"\n✅ Embedding creation complete!")
     print(f"📊 Statistics:")
-    print(f"  Articles processed: {num_articles:,}")
+    print(f"  Total articles: {num_articles:,}")
+    print(f"  Successfully processed: {processed_articles:,}")
+    print(f"  Skipped (empty/invalid): {skipped_articles:,}")
     print(f"  Total chunks created: {total_chunks:,}")
+    print(f"  Average chunks per article: {total_chunks/max(processed_articles, 1):.1f}")
     
     # Test retrieval
     print(f"\n🔍 Testing retrieval...")
