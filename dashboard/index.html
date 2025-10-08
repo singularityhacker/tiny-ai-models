@@ -368,6 +368,9 @@
                                 <th class="sortable" data-sort="task">
                                     Task <span class="sort-arrow">↕</span>
                                 </th>
+                                <th class="sortable" data-sort="questions">
+                                    Questions <span class="sort-arrow">↕</span>
+                                </th>
                                 <th class="sortable" data-sort="accuracy">
                                     Accuracy <span class="sort-arrow">↕</span>
                                 </th>
@@ -527,13 +530,28 @@
                 const accuracies = Object.values(results)
                     .filter(r => r['acc,none'] !== undefined)
                     .map(r => r['acc,none']);
-                const overallAccuracy = accuracies.reduce((a, b) => a + b, 0) / accuracies.length;
+                const overallAccuracy = accuracies.length > 0 ? accuracies.reduce((a, b) => a + b, 0) / accuracies.length : 0;
 
                 document.getElementById('overallAccuracy').textContent = (overallAccuracy * 100).toFixed(1) + '%';
-                document.getElementById('hellaswagScore').textContent = (results.hellaswag['acc,none'] * 100).toFixed(1) + '%';
-                document.getElementById('mmluScore').textContent = (results.mmlu['acc,none'] * 100).toFixed(1) + '%';
                 
-                // Calculate total questions and breakdown
+                // Handle hellaswag score - may not exist in subsection tests
+                const hellaswagScore = results.hellaswag ? (results.hellaswag['acc,none'] * 100).toFixed(1) + '%' : 'N/A';
+                document.getElementById('hellaswagScore').textContent = hellaswagScore;
+                
+                // Handle mmlu score - check for main mmlu task or any mmlu subsection
+                let mmluScore = 'N/A';
+                if (results.mmlu) {
+                    mmluScore = (results.mmlu['acc,none'] * 100).toFixed(1) + '%';
+                } else {
+                    // Look for any MMLU subsection task
+                    const mmluSubsection = Object.keys(results).find(key => key.startsWith('mmlu_'));
+                    if (mmluSubsection) {
+                        mmluScore = (results[mmluSubsection]['acc,none'] * 100).toFixed(1) + '%';
+                    }
+                }
+                document.getElementById('mmluScore').textContent = mmluScore;
+                
+                // Calculate total questions - simplified display
                 const questionData = this.calculateQuestionBreakdown(data);
                 document.getElementById('totalQuestions').textContent = questionData.total.toLocaleString();
                 
@@ -541,8 +559,8 @@
                 const isLimitedTest = data.config && data.config.limit && data.config.limit < 1000;
                 document.getElementById('questionsSubtitle').textContent = isLimitedTest ? 'limited test' : 'full evaluation';
                 
-                // Show breakdown
-                document.getElementById('questionBreakdown').innerHTML = questionData.breakdown;
+                // Hide the detailed breakdown from the metric card (moved to table)
+                document.getElementById('questionBreakdown').innerHTML = '';
                 
                 // Display test duration
                 const duration = this.formatDuration(data);
@@ -557,40 +575,69 @@
             }
 
             calculateQuestionBreakdown(data) {
-                // Estimate total questions based on config limit and number of tasks
                 const config = data.config || {};
                 const limit = config.limit;
                 const results = data.results || {};
+                const nSamples = data['n-samples'] || {};
                 
-                // Count main tasks (hellaswag, mmlu)
-                const mainTasks = Object.keys(results).filter(key => 
-                    key === 'hellaswag' || key === 'mmlu'
-                );
+                let total = 0;
+                let breakdownParts = [];
                 
-                // Calculate questions per test
-                let hellaswagQuestions = 0;
-                let mmluQuestions = 0;
-                
-                if (limit && limit < 1000) {
-                    // Limited test - use the limit value per task
-                    if (results.hellaswag) hellaswagQuestions = Math.round(limit);
-                    if (results.mmlu) mmluQuestions = Math.round(limit);
+                // Check if we have n-samples data (more accurate)
+                if (Object.keys(nSamples).length > 0) {
+                    Object.keys(nSamples).forEach(task => {
+                        const samples = nSamples[task];
+                        const count = samples.effective || samples.original || 0;
+                        if (count > 0) {
+                            total += count;
+                            // Create friendly task name
+                            const taskName = this.formatTaskName(task);
+                            breakdownParts.push(`${taskName}: ${count.toLocaleString()}`);
+                        }
+                    });
                 } else {
-                    // Full evaluation - use actual dataset sizes
-                    if (results.hellaswag) hellaswagQuestions = 10042;
-                    if (results.mmlu) mmluQuestions = 15908;
+                    // Fallback: estimate from known task sizes
+                    if (results.hellaswag) {
+                        const count = (limit && limit < 1000) ? limit : 10042;
+                        total += count;
+                        breakdownParts.push(`HellaSwag: ${count.toLocaleString()}`);
+                    }
+                    if (results.mmlu) {
+                        const count = (limit && limit < 1000) ? limit : 15908;
+                        total += count;
+                        breakdownParts.push(`MMLU: ${count.toLocaleString()}`);
+                    }
+                    // Handle subsection tests
+                    Object.keys(results).forEach(key => {
+                        if (key.startsWith('mmlu_') && key !== 'mmlu_humanities' && key !== 'mmlu_other' && key !== 'mmlu_stem' && key !== 'mmlu_social_sciences') {
+                            // This is a specific MMLU subsection - estimate 100 questions
+                            const count = 100; // Most MMLU subsections have ~100 questions
+                            total += count;
+                            const taskName = this.formatTaskName(key);
+                            breakdownParts.push(`${taskName}: ${count.toLocaleString()}`);
+                        }
+                    });
                 }
-                
-                const total = hellaswagQuestions + mmluQuestions;
-                const breakdown = `
-                    ${hellaswagQuestions > 0 ? `HellaSwag: ${hellaswagQuestions.toLocaleString()}<br>` : ''}
-                    ${mmluQuestions > 0 ? `MMLU: ${mmluQuestions.toLocaleString()}` : ''}
-                `;
                 
                 return {
                     total: total,
-                    breakdown: breakdown.trim()
+                    breakdown: breakdownParts.join('<br>')
                 };
+            }
+            
+            formatTaskName(task) {
+                // Convert task names to friendly format
+                if (task === 'hellaswag') return 'HellaSwag';
+                if (task === 'mmlu') return 'MMLU';
+                if (task.startsWith('mmlu_')) {
+                    const name = task.replace('mmlu_', '').split('_').map(word => 
+                        word.charAt(0).toUpperCase() + word.slice(1)
+                    ).join(' ');
+                    return `MMLU: ${name}`;
+                }
+                return task.split('_').map(word => 
+                    word.charAt(0).toUpperCase() + word.slice(1)
+                ).join(' ');
             }
 
             formatDuration(data) {
@@ -621,23 +668,49 @@
                 }
 
                 const results = data.results;
-                const mainTasks = ['hellaswag', 'mmlu'];
+                
+                // Dynamically determine which tasks to show
+                const availableTasks = [];
+                const taskLabels = [];
+                const taskData = [];
+                
+                // Prioritize main tasks
+                if (results.hellaswag) {
+                    availableTasks.push('hellaswag');
+                    taskLabels.push('HellaSwag');
+                    taskData.push((results.hellaswag['acc,none'] * 100).toFixed(1));
+                }
+                if (results.mmlu) {
+                    availableTasks.push('mmlu');
+                    taskLabels.push('MMLU');
+                    taskData.push((results.mmlu['acc,none'] * 100).toFixed(1));
+                }
+                
+                // If no main tasks, show available subsection tasks (up to 5)
+                if (availableTasks.length === 0) {
+                    const subsectionTasks = Object.keys(results)
+                        .filter(key => key.startsWith('mmlu_') && results[key]['acc,none'] !== undefined)
+                        .slice(0, 5);
+                    
+                    subsectionTasks.forEach(task => {
+                        availableTasks.push(task);
+                        taskLabels.push(this.formatTaskName(task));
+                        taskData.push((results[task]['acc,none'] * 100).toFixed(1));
+                    });
+                }
+                
+                // Generate colors based on number of tasks
+                const colors = this.generateColors(availableTasks.length);
                 
                 this.charts.performance = new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: ['HellaSwag', 'MMLU'],
+                        labels: taskLabels,
                         datasets: [{
                             label: 'Accuracy (%)',
-                            data: mainTasks.map(task => (results[task]['acc,none'] * 100).toFixed(1)),
-                            backgroundColor: [
-                                'rgba(102, 126, 234, 0.8)',
-                                'rgba(118, 75, 162, 0.8)'
-                            ],
-                            borderColor: [
-                                'rgba(102, 126, 234, 1)',
-                                'rgba(118, 75, 162, 1)'
-                            ],
+                            data: taskData,
+                            backgroundColor: colors.background,
+                            borderColor: colors.border,
                             borderWidth: 2
                         }]
                     },
@@ -671,24 +744,55 @@
                 }
 
                 const results = data.results;
-                const mmluSubjects = Object.keys(results)
-                    .filter(key => key.startsWith('mmlu_') && key !== 'mmlu')
+                
+                // Find MMLU-related tasks (categories or subsections)
+                const mmluTasks = Object.keys(results)
+                    .filter(key => {
+                        // Include category groups (mmlu_humanities, etc.) and subsections
+                        if (key === 'mmlu') return false; // Skip the main aggregate
+                        if (key.startsWith('mmlu_')) {
+                            // Check if it has an alias indicating it's a category or subsection
+                            const alias = results[key].alias || '';
+                            // Categories have single dash prefix, subsections have double dash
+                            return alias.includes('-') || results[key]['acc,none'] !== undefined;
+                        }
+                        return false;
+                    })
                     .map(key => ({
-                        name: results[key].alias.replace(/^\s*-\s*/, '').replace(/_/g, ' '),
+                        name: results[key].alias ? results[key].alias.replace(/^\s*-+\s*/, '').replace(/_/g, ' ') : this.formatTaskName(key),
                         accuracy: results[key]['acc,none']
-                    }));
+                    }))
+                    .filter(item => item.accuracy !== undefined);
+
+                // If no MMLU breakdown available, show a simple message chart
+                if (mmluTasks.length === 0) {
+                    this.charts.mmluBreakdown = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['No breakdown available'],
+                            datasets: [{
+                                data: [1],
+                                backgroundColor: ['#e9ecef']
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: { enabled: false }
+                            }
+                        }
+                    });
+                    return;
+                }
 
                 this.charts.mmluBreakdown = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
-                        labels: mmluSubjects.map(s => s.name),
+                        labels: mmluTasks.map(s => s.name),
                         datasets: [{
-                            data: mmluSubjects.map(s => (s.accuracy * 100).toFixed(1)),
-                            backgroundColor: [
-                                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
-                                '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF',
-                                '#4BC0C0', '#FF6384', '#36A2EB'
-                            ]
+                            data: mmluTasks.map(s => (s.accuracy * 100).toFixed(1)),
+                            backgroundColor: this.generateChartColors(mmluTasks.length)
                         }]
                     },
                     options: {
@@ -705,16 +809,65 @@
                     }
                 });
             }
+            
+            generateColors(count) {
+                const baseColors = [
+                    'rgba(102, 126, 234, 0.8)',
+                    'rgba(118, 75, 162, 0.8)',
+                    'rgba(237, 100, 166, 0.8)',
+                    'rgba(255, 159, 64, 0.8)',
+                    'rgba(75, 192, 192, 0.8)'
+                ];
+                const borderColors = [
+                    'rgba(102, 126, 234, 1)',
+                    'rgba(118, 75, 162, 1)',
+                    'rgba(237, 100, 166, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(75, 192, 192, 1)'
+                ];
+                
+                return {
+                    background: baseColors.slice(0, count),
+                    border: borderColors.slice(0, count)
+                };
+            }
+            
+            generateChartColors(count) {
+                const colors = [
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                    '#9966FF', '#FF9F40', '#E7E9ED', '#8BC34A',
+                    '#FF5722', '#607D8B', '#795548', '#9C27B0'
+                ];
+                return colors.slice(0, count);
+            }
 
             populateTable(data) {
                 // Store the data for sorting
                 this.tableData = [];
+                const nSamples = data['n-samples'] || {};
+                
                 Object.entries(data.results).forEach(([taskKey, result]) => {
                     if (result['acc,none'] === undefined) return;
+                    
+                    // Get question count for this task
+                    let questions = 0;
+                    if (nSamples[taskKey]) {
+                        questions = nSamples[taskKey].effective || nSamples[taskKey].original || 0;
+                    } else {
+                        // Fallback estimation
+                        if (taskKey === 'hellaswag') {
+                            questions = 10042;
+                        } else if (taskKey === 'mmlu') {
+                            questions = 15908;
+                        } else if (taskKey.startsWith('mmlu_')) {
+                            questions = 100; // Most MMLU subsections have ~100 questions
+                        }
+                    }
                     
                     this.tableData.push({
                         task: result.alias || taskKey,
                         taskKey: taskKey,
+                        questions: questions,
                         accuracy: result['acc,none'],
                         error: result['acc_stderr,none'] || 0
                     });
@@ -731,6 +884,7 @@
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${item.task}</td>
+                        <td>${item.questions.toLocaleString()}</td>
                         <td>${(item.accuracy * 100).toFixed(2)}%</td>
                         <td>±${(item.error * 100).toFixed(2)}%</td>
                         <td>
@@ -765,6 +919,10 @@
                         case 'task':
                             aVal = a.task.toLowerCase();
                             bVal = b.task.toLowerCase();
+                            break;
+                        case 'questions':
+                            aVal = a.questions;
+                            bVal = b.questions;
                             break;
                         case 'accuracy':
                             aVal = a.accuracy;
