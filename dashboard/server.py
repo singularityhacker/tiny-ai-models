@@ -179,7 +179,7 @@ def start_server(port=8080, results_dir="../results"):
     """Start the dashboard server"""
     handler = create_handler(results_dir)
     
-    with HTTPServer(('localhost', port), handler) as httpd:
+    with HTTPServer(('0.0.0.0', port), handler) as httpd:
         print(f"🚀 Tiny AI Models Dashboard starting...")
         print(f"📊 Serving results from: {os.path.abspath(results_dir)}")
         print(f"🌐 Dashboard available at: http://localhost:{port}")
@@ -208,7 +208,7 @@ if __name__ == "__main__":
     import sys
     
     # Parse command line arguments
-    port = 8080
+    port = int(os.environ.get('PORT', 8080))
     results_dir = "../results"
     
     if len(sys.argv) > 1:
