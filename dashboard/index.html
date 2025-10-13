@@ -14,185 +14,194 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+            background: #1e1e1e;
+            color: #d4d4d4;
             min-height: 100vh;
             padding: 20px;
+            line-height: 1.4;
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            background: #252526;
+            border: 1px solid #3e3e42;
             overflow: hidden;
         }
 
         .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            color: white;
-            padding: 30px;
+            background: #2d2d30;
+            border-bottom: 1px solid #3e3e42;
+            color: #cccccc;
+            padding: 20px;
             text-align: center;
         }
 
         .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            font-weight: 300;
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            font-weight: normal;
+            color: #ffffff;
         }
 
         .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
+            font-size: 0.9rem;
+            color: #858585;
         }
 
         .controls {
-            padding: 20px 30px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
+            padding: 15px 20px;
+            background: #252526;
+            border-bottom: 1px solid #3e3e42;
         }
 
         .control-group {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             align-items: center;
             flex-wrap: wrap;
         }
 
         .control-group label {
-            font-weight: 600;
-            color: #495057;
+            font-weight: normal;
+            color: #cccccc;
+            font-size: 0.9rem;
         }
 
         select, input {
-            padding: 8px 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: border-color 0.3s;
+            padding: 6px 8px;
+            border: 1px solid #3e3e42;
+            background: #3c3c3c;
+            color: #cccccc;
+            font-size: 0.9rem;
+            font-family: 'Courier New', monospace;
         }
 
         select:focus, input:focus {
-            outline: none;
-            border-color: #667eea;
+            outline: 1px solid #007acc;
+            border-color: #007acc;
+        }
+
+        select option {
+            background: #3c3c3c;
+            color: #cccccc;
         }
 
         .main-content {
-            padding: 30px;
+            padding: 20px;
+            background: #252526;
         }
 
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
         }
 
         .metric-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 12px;
+            background: #2d2d30;
+            border: 1px solid #3e3e42;
+            color: #cccccc;
+            padding: 15px;
             text-align: center;
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-            transition: transform 0.3s;
-        }
-
-        .metric-card:hover {
-            transform: translateY(-5px);
         }
 
         .metric-card h3 {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+            color: #858585;
+            font-weight: normal;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-            opacity: 0.9;
+            letter-spacing: 0.5px;
         }
 
         .metric-card .value {
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin-bottom: 5px;
+            font-size: 1.6rem;
+            font-weight: normal;
+            margin-bottom: 4px;
+            color: #ffffff;
         }
 
         .metric-card .subtitle {
-            font-size: 0.8rem;
-            opacity: 0.8;
+            font-size: 0.7rem;
+            color: #858585;
         }
 
         .charts-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
+            gap: 20px;
+            margin-bottom: 25px;
         }
 
         .chart-container {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: #2d2d30;
+            border: 1px solid #3e3e42;
+            padding: 15px;
         }
 
         .chart-container h3 {
-            margin-bottom: 20px;
-            color: #2c3e50;
-            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: normal;
         }
 
         .detailed-results {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: #2d2d30;
+            border: 1px solid #3e3e42;
             overflow: hidden;
         }
 
         .detailed-results h3 {
-            background: #f8f9fa;
-            padding: 20px 25px;
+            background: #3c3c3c;
+            padding: 12px 15px;
             margin: 0;
-            color: #2c3e50;
-            border-bottom: 1px solid #e9ecef;
+            color: #ffffff;
+            font-size: 0.9rem;
+            font-weight: normal;
+            border-bottom: 1px solid #3e3e42;
         }
 
         .results-table {
             width: 100%;
             border-collapse: collapse;
+            background: #2d2d30;
         }
 
         .results-table th,
         .results-table td {
-            padding: 12px 15px;
+            padding: 8px 12px;
             text-align: left;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: 1px solid #3e3e42;
+            color: #cccccc;
+            font-size: 0.85rem;
         }
 
         .results-table th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #495057;
+            background: #3c3c3c;
+            color: #ffffff;
             position: sticky;
             top: 0;
+            font-weight: normal;
+            border-bottom: 1px solid #3e3e42;
         }
 
         .sortable {
             cursor: pointer;
             user-select: none;
-            transition: background-color 0.2s;
-            position: relative;
         }
 
         .sortable:hover {
-            background: #e9ecef;
+            background: #404040;
         }
 
         .sort-arrow {
             font-size: 0.8em;
             margin-left: 5px;
-            opacity: 0.5;
-            transition: opacity 0.2s;
+            opacity: 0.6;
         }
 
         .sortable:hover .sort-arrow {
@@ -201,7 +210,7 @@
 
         .sort-arrow.active {
             opacity: 1;
-            color: #667eea;
+            color: #007acc;
         }
 
         .sort-arrow.asc::after {
@@ -213,21 +222,21 @@
         }
 
         .results-table tr:hover {
-            background: #f8f9fa;
+            background: #323232;
         }
 
         .accuracy-bar {
             width: 100%;
-            height: 20px;
-            background: #e9ecef;
-            border-radius: 10px;
+            height: 16px;
+            background: #3e3e42;
+            border: 1px solid #464647;
             overflow: hidden;
             position: relative;
         }
 
         .accuracy-fill {
             height: 100%;
-            background: linear-gradient(90deg, #e74c3c 0%, #f39c12 50%, #27ae60 100%);
+            background: #d4d4d4;
             transition: width 0.3s ease;
         }
 
@@ -236,23 +245,23 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 12px;
-            font-weight: 600;
-            color: #2c3e50;
+            font-size: 10px;
+            font-weight: normal;
+            color: #1e1e1e;
         }
 
         .loading {
             text-align: center;
-            padding: 40px;
-            color: #6c757d;
+            padding: 30px;
+            color: #858585;
         }
 
         .error {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 6px;
-            margin: 20px 0;
+            background: #3c3c3c;
+            border: 1px solid #f44747;
+            color: #f48771;
+            padding: 12px;
+            margin: 15px 0;
         }
 
         .comparison-mode {
@@ -274,7 +283,7 @@
             }
             
             .header h1 {
-                font-size: 2rem;
+                font-size: 1.5rem;
             }
         }
     </style>
@@ -717,13 +726,25 @@
                     options: {
                         responsive: true,
                         scales: {
+                            x: {
+                                ticks: {
+                                    color: '#cccccc'
+                                },
+                                grid: {
+                                    color: '#3e3e42'
+                                }
+                            },
                             y: {
                                 beginAtZero: true,
                                 max: 100,
                                 ticks: {
+                                    color: '#cccccc',
                                     callback: function(value) {
                                         return value + '%';
                                     }
+                                },
+                                grid: {
+                                    color: '#3e3e42'
                                 }
                             }
                         },
@@ -772,7 +793,7 @@
                             labels: ['No breakdown available'],
                             datasets: [{
                                 data: [1],
-                                backgroundColor: ['#e9ecef']
+                                backgroundColor: ['#3e3e42']
                             }]
                         },
                         options: {
@@ -795,35 +816,36 @@
                             backgroundColor: this.generateChartColors(mmluTasks.length)
                         }]
                     },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    padding: 20,
-                                    usePointStyle: true
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        color: '#cccccc',
+                                        padding: 20,
+                                        usePointStyle: true
+                                    }
                                 }
                             }
                         }
-                    }
                 });
             }
             
             generateColors(count) {
                 const baseColors = [
-                    'rgba(102, 126, 234, 0.8)',
-                    'rgba(118, 75, 162, 0.8)',
-                    'rgba(237, 100, 166, 0.8)',
-                    'rgba(255, 159, 64, 0.8)',
-                    'rgba(75, 192, 192, 0.8)'
+                    'rgba(212, 212, 212, 0.8)',
+                    'rgba(187, 187, 187, 0.8)',
+                    'rgba(162, 162, 162, 0.8)',
+                    'rgba(137, 137, 137, 0.8)',
+                    'rgba(112, 112, 112, 0.8)'
                 ];
                 const borderColors = [
-                    'rgba(102, 126, 234, 1)',
-                    'rgba(118, 75, 162, 1)',
-                    'rgba(237, 100, 166, 1)',
-                    'rgba(255, 159, 64, 1)',
-                    'rgba(75, 192, 192, 1)'
+                    'rgba(212, 212, 212, 1)',
+                    'rgba(187, 187, 187, 1)',
+                    'rgba(162, 162, 162, 1)',
+                    'rgba(137, 137, 137, 1)',
+                    'rgba(112, 112, 112, 1)'
                 ];
                 
                 return {
@@ -834,9 +856,9 @@
             
             generateChartColors(count) {
                 const colors = [
-                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
-                    '#9966FF', '#FF9F40', '#E7E9ED', '#8BC34A',
-                    '#FF5722', '#607D8B', '#795548', '#9C27B0'
+                    '#d4d4d4', '#bbbbbb', '#a2a2a2', '#898989',
+                    '#707070', '#575757', '#3e3e3e', '#252525',
+                    '#1a1a1a', '#0f0f0f', '#ffffff', '#cccccc'
                 ];
                 return colors.slice(0, count);
             }
