@@ -34,7 +34,7 @@ This project provides a complete workflow for:
 
 ## Running Evaluations with lm-eval
 
-### Basic Evaluation
+### Basic Evaluation (Baseline)
 
 Run a quick test with limited samples:
 ```bash
@@ -46,7 +46,7 @@ lm_eval --model hf \
   --device mps
 ```
 
-### Full Evaluation
+### Full Evaluation (Baseline)
 
 Run complete evaluation on all questions:
 ```bash
@@ -55,6 +55,36 @@ lm_eval --model hf \
   --tasks hellaswag,mmlu \
   --output_path ./results/ \
   --device mps
+```
+
+### RAG-Enhanced Evaluation (NEW! 🎯)
+
+Run evaluation with Wikipedia knowledge base augmentation:
+
+**Quick test (10 questions):**
+```bash
+python rag_eval.py \
+  --model meta-llama/Llama-3.2-3B \
+  --tasks mmlu_global_facts \
+  --device mps \
+  --limit 10
+```
+
+**Full evaluation:**
+```bash
+python rag_eval.py \
+  --model meta-llama/Llama-3.2-3B \
+  --tasks mmlu_global_facts \
+  --device mps
+```
+
+**Customize retrieval:**
+```bash
+python rag_eval.py \
+  --model meta-llama/Llama-3.2-3B \
+  --tasks mmlu_global_facts \
+  --device mps \
+  --n_retrieval 5  # Retrieve 5 Wikipedia chunks instead of 3
 ```
 
 ### Evaluation Options
@@ -172,14 +202,17 @@ tiny-ai-models/
 │   ├── index.html      # Interactive dashboard interface
 │   └── server.py       # HTTP server with API endpoints
 ├── results/            # Evaluation results (auto-generated)
-│   └── meta-llama__Llama-3.2-3B/
-│       ├── results_2025-10-03T14-37-54.407411.json  # Limited test (10 samples)
-│       └── results_2025-10-03T23-47-07.831204.json  # Full evaluation
+│   ├── meta-llama__Llama-3.2-3B/          # Baseline model results
+│   │   ├── results_2025-10-03T14-37-54.407411.json  # Limited test
+│   │   └── results_2025-10-03T23-47-07.831204.json  # Full evaluation
+│   └── rag-meta-llama__Llama-3.2-3B/      # RAG-enhanced model results
+│       └── results_2025-10-08T18:09:50.857457.json
 ├── simple_wikipedia/   # Wikipedia dataset (auto-generated)
 ├── chroma_db/         # Vector embeddings database (auto-generated)
 ├── simple-wiki-dl.py  # Wikipedia downloader script
 ├── create_embeddings_simple.py  # Embedding creation script
 ├── query_embeddings.py # Knowledge base query tool
+├── rag_eval.py        # RAG-enhanced evaluation script (NEW!)
 ├── requirements.txt    # Python dependencies
 ├── README.md          # This file
 └── notes.md           # Project notes and development log
@@ -304,21 +337,59 @@ python server.py 3000  # Use port 3000 instead of 8080
 - **Save results**: Results are automatically saved with timestamps
 - **Compare runs**: Use the dashboard to compare different evaluation runs
 
+## RAG Evaluation System ✅
+
+### What is RAG?
+
+**Retrieval-Augmented Generation (RAG)** enhances language models by providing relevant context from a knowledge base. Before answering each question, the system:
+
+1. Searches the Wikipedia knowledge base for relevant information
+2. Retrieves the most relevant chunks (default: 3)
+3. Augments the question prompt with this context
+4. Lets the model answer with enriched information
+
+### How It Works
+
+The `rag_eval.py` script:
+- Wraps the base Llama model with RAG capabilities
+- Queries ChromaDB for relevant Wikipedia content for each question
+- Injects retrieved context into prompts automatically
+- Saves results in the same format as baseline evaluations
+- Results appear in dashboard as a separate model for easy comparison
+
+### Performance Comparison
+
+Early results show RAG improvement on global facts:
+- **Baseline model:** 25% accuracy (100 questions)
+- **RAG-enhanced:** 30% accuracy (10 question sample)
+
+Results are directly comparable in the dashboard!
+
+### RAG Options
+
+- `--n_retrieval N`: Number of Wikipedia chunks to retrieve (default: 3)
+- `--chroma_path PATH`: Path to ChromaDB (default: ./chroma_db)
+- All standard lm-eval options work: `--limit`, `--device`, `--tasks`, etc.
+
 ## Next Steps & Future Development
 
 ### Immediate Next Steps
 
-1. **Scale up Wikipedia embeddings:**
-   - Remove the 100-article limit in `create_embeddings_simple.py`
-   - Process all 205,328 Simple Wikipedia articles
-   - This will take 30-60 minutes but create a comprehensive knowledge base
+1. ✅ **Scale up Wikipedia embeddings:** COMPLETE!
+   - All Simple Wikipedia articles processed
+   - Comprehensive knowledge base ready
 
-2. **Integrate with evaluations:**
-   - Build retrieval-augmented evaluation system
-   - Use Wikipedia context to enhance MMLU/HellaSwag question answering
-   - Compare model performance with and without knowledge base assistance
+2. ✅ **Integrate with evaluations:** COMPLETE!
+   - RAG evaluation system implemented (`rag_eval.py`)
+   - Wikipedia context enhances question answering
+   - Dashboard shows baseline vs RAG comparison
 
-3. **Enhanced dashboard features:**
+3. **Run comprehensive RAG evaluations:**
+   - Test on full MMLU global_facts dataset (100 questions)
+   - Try other MMLU subjects where Wikipedia helps
+   - Experiment with different retrieval settings (n_retrieval=5, 7, 10)
+
+4. **Enhanced dashboard features:**
    - Add knowledge base integration to the dashboard
    - Show which Wikipedia articles were used for each evaluation
    - Display retrieval quality metrics
@@ -363,4 +434,3 @@ python server.py 3000  # Use port 3000 instead of 8080
     - Analyze model performance across different demographic groups
     - Study knowledge representation biases
     - Implement fairness metrics in evaluations
-

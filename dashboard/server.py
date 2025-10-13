@@ -9,7 +9,7 @@ import os
 import glob
 from datetime import datetime
 from http.server import HTTPServer, SimpleHTTPRequestHandler
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import urlparse, parse_qs, unquote
 import threading
 import webbrowser
 
@@ -78,9 +78,18 @@ class DashboardHandler(SimpleHTTPRequestHandler):
                 timestamp_match = filename.replace('results_', '').replace('.json', '')
                 
                 try:
-                    # Parse timestamp - handle the format with hyphens in time
-                    # Convert "2025-10-03T14-37-54.407411" to "2025-10-03T14:37:54.407411"
-                    iso_timestamp = timestamp_match.replace('-', ':', 2)  # Only replace first 2 hyphens
+                    # Parse timestamp - handle both formats:
+                    # Old format: "2025-10-03T14-37-54.407411" (hyphens in time)
+                    # New format: "2025-10-08T18:07:30.803202" (colons in time - proper ISO)
+                    iso_timestamp = timestamp_match
+                    
+                    # Check if time portion has hyphens instead of colons
+                    if 'T' in iso_timestamp:
+                        date_part, time_part = iso_timestamp.split('T', 1)
+                        # Replace hyphens with colons in time part only
+                        time_part = time_part.replace('-', ':')
+                        iso_timestamp = f"{date_part}T{time_part}"
+                    
                     timestamp = datetime.fromisoformat(iso_timestamp)
                     
                     # Try to determine if this is a limited test by reading the config
@@ -125,7 +134,8 @@ class DashboardHandler(SimpleHTTPRequestHandler):
                 self.send_error_response("Invalid path format")
                 return
             
-            run_id = path_parts[3]
+            # URL decode the run_id (handles %3A -> : etc.)
+            run_id = unquote(path_parts[3])
             
             # Find the JSON file
             json_files = glob.glob(os.path.join(self.results_dir, "**", f"{run_id}.json"), recursive=True)

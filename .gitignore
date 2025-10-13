@@ -12,3 +12,7 @@ env/
 simple_wikipedia/
 chroma_db/
 results/
+
+__pycache__/
+*.pyc
+*.pyo
