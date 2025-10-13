@@ -11,6 +11,8 @@ env/
 # Generated Data (recreated by scripts)
 simple_wikipedia/
 chroma_db/
+results/
+
 
 __pycache__/
 *.pyc
