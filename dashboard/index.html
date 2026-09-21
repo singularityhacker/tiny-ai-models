@@ -4,189 +4,297 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tiny AI Models - Evaluation Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <style>
+        :root {
+            --bg-deep: #070b16;
+            --bg-panel: #10182b;
+            --bg-card: #162038;
+            --bg-elevated: #1c2848;
+            --line: #2b3d6a;
+            --text: #e8f0ff;
+            --muted: #93a4c8;
+            --cyan: #00e5ff;
+            --magenta: #ff2d95;
+            --lime: #b6ff3b;
+            --amber: #ffb020;
+            --violet: #8b6cff;
+            --orange: #ff6e40;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        html {
+            -webkit-text-size-adjust: 100%;
+        }
+
         body {
-            font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
-            background: #1e1e1e;
-            color: #d4d4d4;
+            font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Courier New', monospace;
+            background:
+                radial-gradient(1200px 500px at 10% -10%, rgba(0, 229, 255, 0.18), transparent 55%),
+                radial-gradient(900px 420px at 100% 0%, rgba(255, 45, 149, 0.16), transparent 50%),
+                var(--bg-deep);
+            color: var(--text);
             min-height: 100vh;
             padding: 20px;
-            line-height: 1.4;
+            padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+            line-height: 1.5;
+            overflow-x: hidden;
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            background: #252526;
-            border: 1px solid #3e3e42;
+            background: var(--bg-panel);
+            border: 1px solid var(--line);
             overflow: hidden;
+            box-shadow: 0 0 0 1px rgba(0, 229, 255, 0.08), 0 24px 80px rgba(0, 0, 0, 0.45);
         }
 
         .header {
-            background: #2d2d30;
-            border-bottom: 1px solid #3e3e42;
-            color: #cccccc;
-            padding: 20px;
-            text-align: center;
+            background:
+                linear-gradient(120deg, rgba(0, 229, 255, 0.16), rgba(255, 45, 149, 0.12) 50%, rgba(182, 255, 59, 0.08)),
+                var(--bg-card);
+            border-bottom: 1px solid var(--line);
+            color: var(--text);
+            padding: 28px 24px 24px;
+            text-align: left;
         }
 
         .header h1 {
-            font-size: 1.8rem;
-            margin-bottom: 8px;
-            font-weight: normal;
+            font-size: clamp(1.4rem, 4vw, 2rem);
+            margin-bottom: 10px;
+            font-weight: 700;
             color: #ffffff;
+            letter-spacing: -0.02em;
         }
 
-        .header p {
-            font-size: 0.9rem;
-            color: #858585;
+        .header .tagline {
+            font-size: 0.95rem;
+            color: var(--cyan);
+            margin-bottom: 14px;
+        }
+
+        .header .about {
+            font-size: 0.95rem;
+            color: var(--muted);
+            max-width: 72ch;
+            line-height: 1.65;
+        }
+
+        .header .about a {
+            color: var(--lime);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            font-weight: 600;
+        }
+
+        .header .about a:hover,
+        .header .about a:focus-visible {
+            color: var(--cyan);
         }
 
         .controls {
-            padding: 15px 20px;
-            background: #252526;
-            border-bottom: 1px solid #3e3e42;
+            padding: 16px 20px;
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--line);
         }
 
         .control-group {
             display: flex;
-            gap: 15px;
+            gap: 16px;
             align-items: center;
             flex-wrap: wrap;
         }
 
+        .control-field {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            flex: 1 1 220px;
+        }
+
+        .control-field.checkbox-field {
+            flex: 0 1 auto;
+        }
+
         .control-group label {
             font-weight: normal;
-            color: #cccccc;
-            font-size: 0.9rem;
+            color: var(--muted);
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        select, input[type="checkbox"] {
+            accent-color: var(--cyan);
         }
 
         select, input {
-            padding: 6px 8px;
-            border: 1px solid #3e3e42;
-            background: #3c3c3c;
-            color: #cccccc;
-            font-size: 0.9rem;
-            font-family: 'Courier New', monospace;
+            padding: 10px 12px;
+            border: 1px solid var(--line);
+            background: var(--bg-elevated);
+            color: var(--text);
+            font-size: 16px;
+            font-family: inherit;
+            min-width: 0;
+            max-width: 100%;
+            border-radius: 6px;
+        }
+
+        select {
+            flex: 1;
+            width: 100%;
         }
 
         select:focus, input:focus {
-            outline: 1px solid #007acc;
-            border-color: #007acc;
+            outline: 2px solid var(--cyan);
+            border-color: var(--cyan);
         }
 
         select option {
-            background: #3c3c3c;
-            color: #cccccc;
+            background: var(--bg-elevated);
+            color: var(--text);
         }
 
         .main-content {
             padding: 20px;
-            background: #252526;
+            background: var(--bg-panel);
         }
 
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
         }
 
         .metric-card {
-            background: #2d2d30;
-            border: 1px solid #3e3e42;
-            color: #cccccc;
-            padding: 15px;
+            background: var(--bg-card);
+            border: 1px solid var(--line);
+            color: var(--text);
+            padding: 16px 12px;
             text-align: center;
+            border-top: 3px solid var(--cyan);
+            min-width: 0;
         }
 
+        .metric-card:nth-child(2) { border-top-color: var(--magenta); }
+        .metric-card:nth-child(3) { border-top-color: var(--lime); }
+        .metric-card:nth-child(4) { border-top-color: var(--amber); }
+        .metric-card:nth-child(5) { border-top-color: var(--violet); }
+        .metric-card:nth-child(6) { border-top-color: var(--orange); }
+
         .metric-card h3 {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             margin-bottom: 8px;
-            color: #858585;
+            color: var(--muted);
             font-weight: normal;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.6px;
         }
 
         .metric-card .value {
-            font-size: 1.6rem;
-            font-weight: normal;
+            font-size: clamp(1.2rem, 3vw, 1.7rem);
+            font-weight: 700;
             margin-bottom: 4px;
             color: #ffffff;
+            overflow-wrap: anywhere;
         }
+
+        .metric-card:nth-child(1) .value { color: var(--cyan); }
+        .metric-card:nth-child(2) .value { color: var(--magenta); }
+        .metric-card:nth-child(3) .value { color: var(--lime); }
 
         .metric-card .subtitle {
             font-size: 0.7rem;
-            color: #858585;
+            color: var(--muted);
         }
 
         .charts-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 25px;
+            gap: 16px;
+            margin-bottom: 24px;
         }
 
         .chart-container {
-            background: #2d2d30;
-            border: 1px solid #3e3e42;
-            padding: 15px;
+            background: var(--bg-card);
+            border: 1px solid var(--line);
+            padding: 16px;
+            min-width: 0;
         }
 
         .chart-container h3 {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             color: #ffffff;
             font-size: 1rem;
-            font-weight: normal;
+            font-weight: 600;
+        }
+
+        .chart-frame {
+            position: relative;
+            height: 280px;
+            width: 100%;
         }
 
         .detailed-results {
-            background: #2d2d30;
-            border: 1px solid #3e3e42;
+            background: var(--bg-card);
+            border: 1px solid var(--line);
             overflow: hidden;
         }
 
         .detailed-results h3 {
-            background: #3c3c3c;
+            background: var(--bg-elevated);
             padding: 12px 15px;
             margin: 0;
             color: #ffffff;
-            font-size: 0.9rem;
-            font-weight: normal;
-            border-bottom: 1px solid #3e3e42;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .results-table {
             width: 100%;
+            min-width: 640px;
             border-collapse: collapse;
-            background: #2d2d30;
+            background: var(--bg-card);
         }
 
         .results-table th,
         .results-table td {
-            padding: 8px 12px;
+            padding: 10px 12px;
             text-align: left;
-            border-bottom: 1px solid #3e3e42;
-            color: #cccccc;
+            border-bottom: 1px solid var(--line);
+            color: var(--text);
             font-size: 0.85rem;
         }
 
+        .results-table td:first-child {
+            overflow-wrap: anywhere;
+        }
+
         .results-table th {
-            background: #3c3c3c;
+            background: var(--bg-elevated);
             color: #ffffff;
             position: sticky;
             top: 0;
-            font-weight: normal;
-            border-bottom: 1px solid #3e3e42;
+            font-weight: 600;
+            border-bottom: 1px solid var(--line);
         }
 
         .sortable {
@@ -195,7 +303,7 @@
         }
 
         .sortable:hover {
-            background: #404040;
+            background: #24335a;
         }
 
         .sort-arrow {
@@ -210,7 +318,7 @@
 
         .sort-arrow.active {
             opacity: 1;
-            color: #007acc;
+            color: var(--cyan);
         }
 
         .sort-arrow.asc::after {
@@ -222,21 +330,22 @@
         }
 
         .results-table tr:hover {
-            background: #323232;
+            background: #1a2744;
         }
 
         .accuracy-bar {
             width: 100%;
-            height: 16px;
-            background: #3e3e42;
-            border: 1px solid #464647;
+            min-width: 90px;
+            height: 18px;
+            background: #0c1222;
+            border: 1px solid var(--line);
             overflow: hidden;
             position: relative;
         }
 
         .accuracy-fill {
             height: 100%;
-            background: #d4d4d4;
+            background: linear-gradient(90deg, var(--cyan), var(--lime));
             transition: width 0.3s ease;
         }
 
@@ -246,20 +355,20 @@
             left: 50%;
             transform: translate(-50%, -50%);
             font-size: 10px;
-            font-weight: normal;
-            color: #1e1e1e;
+            font-weight: 700;
+            color: #061018;
         }
 
         .loading {
             text-align: center;
             padding: 30px;
-            color: #858585;
+            color: var(--muted);
         }
 
         .error {
-            background: #3c3c3c;
-            border: 1px solid #f44747;
-            color: #f48771;
+            background: #3a1424;
+            border: 1px solid var(--magenta);
+            color: #ffb3d4;
             padding: 12px;
             margin: 15px 0;
         }
@@ -270,20 +379,79 @@
 
         .comparison-mode.active {
             display: block;
+            margin-top: 20px;
+            padding: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--line);
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             .charts-section {
                 grid-template-columns: 1fr;
             }
-            
-            .control-group {
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+            }
+
+            .container {
+                border: none;
+                box-shadow: none;
+            }
+
+            .header {
+                padding: 20px 16px 18px;
+            }
+
+            .header h1 {
+                font-size: 1.35rem;
+            }
+
+            .header .about,
+            .header .tagline {
+                font-size: 0.9rem;
+            }
+
+            .controls,
+            .main-content {
+                padding: 14px;
+            }
+
+            .control-group,
+            .control-field {
                 flex-direction: column;
                 align-items: stretch;
             }
-            
-            .header h1 {
-                font-size: 1.5rem;
+
+            .control-field {
+                flex: 1 1 auto;
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+            }
+
+            .chart-frame {
+                height: 230px;
+            }
+
+            .results-table th,
+            .results-table td {
+                padding: 8px 10px;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .metric-card .value {
+                font-size: 1.45rem;
             }
         }
     </style>
@@ -291,25 +459,36 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🤖 Tiny AI Models Dashboard</h1>
-            <p>Visualize and compare evaluation results across different model runs</p>
+            <h1>Tiny AI Models Dashboard</h1>
+            <p class="tagline">Visualize and compare evaluation results across different model runs</p>
+            <p class="about">
+                This is the working companion to
+                <a href="https://www.justiceconder.com/blog/0xjustice-the-unreasonable-effectiveness-of-tiny-ai-models" target="_blank" rel="noopener noreferrer">The Unreasonable Effectiveness of Tiny AI Models</a>.
+                The project evaluates small language models on standard benchmarks such as HellaSwag and MMLU, then reruns those tests with Retrieval-Augmented Generation from Simple Wikipedia so you can see whether a pocket-sized model gets smarter when it can look things up. Pick a model and evaluation run below to inspect accuracy, subject breakdowns, and detailed scores.
+            </p>
         </div>
 
         <div class="controls">
             <div class="control-group">
-                <label for="modelSelect">Model:</label>
-                <select id="modelSelect">
-                    <option value="">Loading models...</option>
-                </select>
+                <div class="control-field">
+                    <label for="modelSelect">Model:</label>
+                    <select id="modelSelect">
+                        <option value="">Loading models...</option>
+                    </select>
+                </div>
 
-                <label for="runSelect">Evaluation Run:</label>
-                <select id="runSelect">
-                    <option value="">Select a run...</option>
-                </select>
+                <div class="control-field">
+                    <label for="runSelect">Evaluation Run:</label>
+                    <select id="runSelect">
+                        <option value="">Select a run...</option>
+                    </select>
+                </div>
 
-                <label>
-                    <input type="checkbox" id="comparisonMode"> Comparison Mode
-                </label>
+                <div class="control-field checkbox-field">
+                    <label>
+                        <input type="checkbox" id="comparisonMode"> Comparison Mode
+                    </label>
+                </div>
             </div>
         </div>
 
@@ -360,17 +539,22 @@
                 <div class="charts-section">
                     <div class="chart-container">
                         <h3>Task Performance Overview</h3>
-                        <canvas id="performanceChart"></canvas>
+                        <div class="chart-frame">
+                            <canvas id="performanceChart"></canvas>
+                        </div>
                     </div>
                     <div class="chart-container">
                         <h3>MMLU Subject Breakdown</h3>
-                        <canvas id="mmluBreakdownChart"></canvas>
+                        <div class="chart-frame">
+                            <canvas id="mmluBreakdownChart"></canvas>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Detailed Results Table -->
                 <div class="detailed-results">
                     <h3>Detailed Results</h3>
+                    <div class="table-wrap">
                     <table class="results-table" id="resultsTable">
                         <thead>
                             <tr>
@@ -392,6 +576,7 @@
                         <tbody id="resultsTableBody">
                         </tbody>
                     </table>
+                    </div>
                 </div>
 
                 <!-- Comparison Mode -->
@@ -725,26 +910,29 @@
                     },
                     options: {
                         responsive: true,
+                        maintainAspectRatio: false,
                         scales: {
                             x: {
                                 ticks: {
-                                    color: '#cccccc'
+                                    color: '#93a4c8',
+                                    maxRotation: 45,
+                                    minRotation: 0
                                 },
                                 grid: {
-                                    color: '#3e3e42'
+                                    color: '#2b3d6a'
                                 }
                             },
                             y: {
                                 beginAtZero: true,
                                 max: 100,
                                 ticks: {
-                                    color: '#cccccc',
+                                    color: '#93a4c8',
                                     callback: function(value) {
                                         return value + '%';
                                     }
                                 },
                                 grid: {
-                                    color: '#3e3e42'
+                                    color: '#2b3d6a'
                                 }
                             }
                         },
@@ -793,11 +981,12 @@
                             labels: ['No breakdown available'],
                             datasets: [{
                                 data: [1],
-                                backgroundColor: ['#3e3e42']
+                                backgroundColor: ['#2b3d6a']
                             }]
                         },
                         options: {
                             responsive: true,
+                            maintainAspectRatio: false,
                             plugins: {
                                 legend: { display: false },
                                 tooltip: { enabled: false }
@@ -818,13 +1007,15 @@
                     },
                         options: {
                             responsive: true,
+                            maintainAspectRatio: false,
                             plugins: {
                                 legend: {
                                     position: 'bottom',
                                     labels: {
-                                        color: '#cccccc',
-                                        padding: 20,
-                                        usePointStyle: true
+                                        color: '#93a4c8',
+                                        padding: 12,
+                                        usePointStyle: true,
+                                        boxWidth: 10
                                     }
                                 }
                             }
@@ -833,34 +1024,30 @@
             }
             
             generateColors(count) {
-                const baseColors = [
-                    'rgba(212, 212, 212, 0.8)',
-                    'rgba(187, 187, 187, 0.8)',
-                    'rgba(162, 162, 162, 0.8)',
-                    'rgba(137, 137, 137, 0.8)',
-                    'rgba(112, 112, 112, 0.8)'
+                const palette = [
+                    { bg: 'rgba(0, 229, 255, 0.85)', border: '#00e5ff' },
+                    { bg: 'rgba(255, 45, 149, 0.85)', border: '#ff2d95' },
+                    { bg: 'rgba(182, 255, 59, 0.85)', border: '#b6ff3b' },
+                    { bg: 'rgba(255, 176, 32, 0.85)', border: '#ffb020' },
+                    { bg: 'rgba(139, 108, 255, 0.85)', border: '#8b6cff' }
                 ];
-                const borderColors = [
-                    'rgba(212, 212, 212, 1)',
-                    'rgba(187, 187, 187, 1)',
-                    'rgba(162, 162, 162, 1)',
-                    'rgba(137, 137, 137, 1)',
-                    'rgba(112, 112, 112, 1)'
-                ];
-                
+                const selected = [];
+                for (let i = 0; i < count; i++) {
+                    selected.push(palette[i % palette.length]);
+                }
                 return {
-                    background: baseColors.slice(0, count),
-                    border: borderColors.slice(0, count)
+                    background: selected.map(color => color.bg),
+                    border: selected.map(color => color.border)
                 };
             }
             
             generateChartColors(count) {
                 const colors = [
-                    '#d4d4d4', '#bbbbbb', '#a2a2a2', '#898989',
-                    '#707070', '#575757', '#3e3e3e', '#252525',
-                    '#1a1a1a', '#0f0f0f', '#ffffff', '#cccccc'
+                    '#00e5ff', '#ff2d95', '#b6ff3b', '#ffb020',
+                    '#8b6cff', '#ff6e40', '#40c4ff', '#76ff03',
+                    '#f50057', '#ffd740', '#7c4dff', '#18ffff'
                 ];
-                return colors.slice(0, count);
+                return Array.from({ length: count }, (_, i) => colors[i % colors.length]);
             }
 
             populateTable(data) {
@@ -911,13 +1098,20 @@
                         <td>±${(item.error * 100).toFixed(2)}%</td>
                         <td>
                             <div class="accuracy-bar">
-                                <div class="accuracy-fill" style="width: ${item.accuracy * 100}%"></div>
+                                <div class="accuracy-fill" style="width: ${item.accuracy * 100}%; background: ${this.getAccuracyFill(item.accuracy)};"></div>
                                 <div class="accuracy-text">${(item.accuracy * 100).toFixed(1)}%</div>
                             </div>
                         </td>
                     `;
                     tbody.appendChild(row);
                 });
+            }
+
+            getAccuracyFill(accuracy) {
+                if (accuracy >= 0.7) return 'linear-gradient(90deg, #00e5ff, #b6ff3b)';
+                if (accuracy >= 0.5) return 'linear-gradient(90deg, #8b6cff, #00e5ff)';
+                if (accuracy >= 0.3) return 'linear-gradient(90deg, #ffb020, #ff6e40)';
+                return 'linear-gradient(90deg, #ff2d95, #ff6e40)';
             }
 
             handleSort(column) {

@@ -394,26 +394,29 @@ def create_static_html(all_data):
                     }},
                     options: {{
                         responsive: true,
+                        maintainAspectRatio: false,
                         scales: {{
                             x: {{
                                 ticks: {{
-                                    color: '#cccccc'
+                                    color: '#93a4c8',
+                                    maxRotation: 45,
+                                    minRotation: 0
                                 }},
                                 grid: {{
-                                    color: '#3e3e42'
+                                    color: '#2b3d6a'
                                 }}
                             }},
                             y: {{
                                 beginAtZero: true,
                                 max: 100,
                                 ticks: {{
-                                    color: '#cccccc',
+                                    color: '#93a4c8',
                                     callback: function(value) {{
                                         return value + '%';
                                     }}
                                 }},
                                 grid: {{
-                                    color: '#3e3e42'
+                                    color: '#2b3d6a'
                                 }}
                             }}
                         }},
@@ -462,11 +465,12 @@ def create_static_html(all_data):
                             labels: ['No breakdown available'],
                             datasets: [{{
                                 data: [1],
-                                backgroundColor: ['#3e3e42']
+                                backgroundColor: ['#2b3d6a']
                             }}]
                         }},
                         options: {{
                             responsive: true,
+                            maintainAspectRatio: false,
                             plugins: {{
                                 legend: {{ display: false }},
                                 tooltip: {{ enabled: false }}
@@ -487,13 +491,15 @@ def create_static_html(all_data):
                     }},
                     options: {{
                         responsive: true,
+                        maintainAspectRatio: false,
                         plugins: {{
                             legend: {{
                                 position: 'bottom',
                                 labels: {{
-                                    color: '#cccccc',
-                                    padding: 20,
-                                    usePointStyle: true
+                                    color: '#93a4c8',
+                                    padding: 12,
+                                    usePointStyle: true,
+                                    boxWidth: 10
                                 }}
                             }}
                         }}
@@ -502,34 +508,37 @@ def create_static_html(all_data):
             }}
             
             generateColors(count) {{
-                const baseColors = [
-                    'rgba(212, 212, 212, 0.8)',
-                    'rgba(187, 187, 187, 0.8)',
-                    'rgba(162, 162, 162, 0.8)',
-                    'rgba(137, 137, 137, 0.8)',
-                    'rgba(112, 112, 112, 0.8)'
+                const palette = [
+                    {{ bg: 'rgba(0, 229, 255, 0.85)', border: '#00e5ff' }},
+                    {{ bg: 'rgba(255, 45, 149, 0.85)', border: '#ff2d95' }},
+                    {{ bg: 'rgba(182, 255, 59, 0.85)', border: '#b6ff3b' }},
+                    {{ bg: 'rgba(255, 176, 32, 0.85)', border: '#ffb020' }},
+                    {{ bg: 'rgba(139, 108, 255, 0.85)', border: '#8b6cff' }}
                 ];
-                const borderColors = [
-                    'rgba(212, 212, 212, 1)',
-                    'rgba(187, 187, 187, 1)',
-                    'rgba(162, 162, 162, 1)',
-                    'rgba(137, 137, 137, 1)',
-                    'rgba(112, 112, 112, 1)'
-                ];
-                
+                const selected = [];
+                for (let i = 0; i < count; i++) {{
+                    selected.push(palette[i % palette.length]);
+                }}
                 return {{
-                    background: baseColors.slice(0, count),
-                    border: borderColors.slice(0, count)
+                    background: selected.map(color => color.bg),
+                    border: selected.map(color => color.border)
                 }};
             }}
             
             generateChartColors(count) {{
                 const colors = [
-                    '#d4d4d4', '#bbbbbb', '#a2a2a2', '#898989',
-                    '#707070', '#575757', '#3e3e3e', '#252525',
-                    '#1a1a1a', '#0f0f0f', '#ffffff', '#cccccc'
+                    '#00e5ff', '#ff2d95', '#b6ff3b', '#ffb020',
+                    '#8b6cff', '#ff6e40', '#40c4ff', '#76ff03',
+                    '#f50057', '#ffd740', '#7c4dff', '#18ffff'
                 ];
-                return colors.slice(0, count);
+                return Array.from({{ length: count }}, (_, i) => colors[i % colors.length]);
+            }}
+
+            getAccuracyFill(accuracy) {{
+                if (accuracy >= 0.7) return 'linear-gradient(90deg, #00e5ff, #b6ff3b)';
+                if (accuracy >= 0.5) return 'linear-gradient(90deg, #8b6cff, #00e5ff)';
+                if (accuracy >= 0.3) return 'linear-gradient(90deg, #ffb020, #ff6e40)';
+                return 'linear-gradient(90deg, #ff2d95, #ff6e40)';
             }}
 
             populateTable(data) {{
@@ -580,7 +589,7 @@ def create_static_html(all_data):
                         <td>±${{(item.error * 100).toFixed(2)}}%</td>
                         <td>
                             <div class="accuracy-bar">
-                                <div class="accuracy-fill" style="width: ${{item.accuracy * 100}}%"></div>
+                                <div class="accuracy-fill" style="width: ${{item.accuracy * 100}}%; background: ${{this.getAccuracyFill(item.accuracy)}};"></div>
                                 <div class="accuracy-text">${{(item.accuracy * 100).toFixed(1)}}%</div>
                             </div>
                         </td>
