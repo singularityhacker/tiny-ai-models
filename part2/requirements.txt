@@ -1,0 +1,2 @@
+# Separate environment: do not upgrade the original experiment's venv.
+lm-eval[hf]==0.4.9.1

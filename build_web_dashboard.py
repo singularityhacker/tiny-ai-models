@@ -711,7 +711,7 @@ def create_static_html(all_data):
         return False
     
     # Replace the entire script section with our static version
-    new_html = html_content[:script_start_index] + data_script + html_content[script_end_index + len(script_end_pattern):]
+    new_html = html_content[:script_start_index].rstrip() + '\n\n' + data_script.lstrip('\n') + html_content[script_end_index + len(script_end_pattern):]
     
     return new_html
 
@@ -745,6 +745,11 @@ def build_web_dashboard():
     output_file = dist_dir / "index.html"
     with open(output_file, 'w') as f:
         f.write(static_html)
+
+    # Publish the proposal alongside the archive. This build only renders
+    # static files: it must never invoke models or provision AWS resources.
+    from part2.blueprint.build import build_blueprint
+    build_blueprint(dist_dir / 'part-ii')
     
     print(f"✅ Static dashboard created: {output_file}")
     print(f"📈 Embedded data for {len(all_data)} models")

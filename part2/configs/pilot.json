@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "execution_approved": false,
+  "seed": 20261026,
+  "protocol": "lm-eval-loglikelihood-zero-shot-v1",
+  "models": [
+    {"id": "historical-3b", "checkpoint": "meta-llama/Llama-3.2-3B", "revision": "13afe5124825b4f3751f836b40dafda64c1ed062"},
+    {"id": "current-sub-1b", "checkpoint": null, "revision": null},
+    {"id": "current-2-to-4b", "checkpoint": null, "revision": null}
+  ],
+  "arms": ["none", "single", "multi_rerank"],
+  "samples": {"mmlu_per_subject": 2, "mmlu_subjects": 57, "hellaswag": 100},
+  "retrieval": {"queries": 4, "candidates_per_query": 20, "final_chunks": 3, "context_tokens": 1536},
+  "budget": {"project_ceiling_usd": 200, "pilot_ceiling_usd": 20, "target_usd": 100, "contingency_fraction": 0.2},
+  "cost_estimate": null
+}
