@@ -4,8 +4,8 @@
   "approval_scope": "User approved Bedrock v0.2 direction and proceeding to next step; preflight required before bounded smoke.",
   "execution_ready": false,
   "blockers": [
-    "Organization service control policy explicitly denies bedrock:ListKnowledgeBases in us-west-2.",
-    "Smoke runner, complete cost reservations, and service setup remain to be implemented/validated."
+    "Converse rejected the first request because AWS account verification is pending; AWS says normally less than 2 hours.",
+    "Full benchmark runner and evaluation job validation remain pending."
   ],
   "region": "us-west-2",
   "model_id": "mistral.ministral-3-3b-instruct",
@@ -17,8 +17,11 @@
   ],
   "budget": {
     "project_ceiling_usd": 200,
-    "pilot_ceiling_usd": 20
+    "pilot_ceiling_usd": 20,
+    "connectivity_test_reserved_usd": 1,
+    "connectivity_retrieval_estimate_usd": 0.003
   },
-  "status": "preflight_blocked",
-  "note": "Planning record only; not consumed by the legacy likelihood runner."
+  "status": "retrieval_smoke_passed_inference_verification_hold",
+  "note": "Planning record only; not consumed by the legacy likelihood runner.",
+  "cleanup_pending": true
 }

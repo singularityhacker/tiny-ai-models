@@ -5,7 +5,8 @@ Ministral 3 3B, managed Knowledge Bases and Bedrock Evaluations. Part II uses a
 new generated-answer protocol, with no direct comparison claim against Part I.
 The user approved this direction and proceeding to preflight with the proposed
 one-model study. [Preflight findings](bedrock/README.md) record the current
-organization-policy blocker. Execution readiness is separate from plan approval.
+smoke results and AWS account-verification hold. Execution readiness is separate
+from plan approval.
 
 **Legacy scaffolding below:** the local likelihood runner and `configs/pilot.json`
 do not implement the Bedrock proposal. The config remains disabled. The older

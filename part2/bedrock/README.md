@@ -4,7 +4,15 @@ The user approved the v0.2 Bedrock direction and the next step. The $20 pilot
 and $200 total ceilings remain. `configs/bedrock.json` records that approval
 separately from execution readiness; the legacy likelihood config stays disabled.
 
-## Verified preflight
+## Current status
+
+The organization policy blocker was resolved by the owner. A five-document
+managed Knowledge Base was successfully created, ingested and queried.
+The first Converse request was rejected because AWS account verification is
+pending. See [the smoke-test report](smoke-2026-10-27.md). No benchmark scores
+or model-generated answers are available yet.
+
+## Original preflight (historical; policy blocker resolved)
 
 - Connected AWS tool authenticated to the previously selected project account.
 - `GetFoundationModelAvailability`, us-west-2, for
