@@ -3,8 +3,9 @@
 **Latest proposal:** [Bedrock blueprint v0.2](blueprint/README.md) proposes
 Ministral 3 3B, managed Knowledge Bases and Bedrock Evaluations. Part II uses a
 new generated-answer protocol, with no direct comparison claim against Part I.
-Only one size-qualified candidate has been found; review must resolve whether
-to start with one or wait for a second. No experiments may run before approval.
+The user approved this direction and proceeding to preflight with the proposed
+one-model study. [Preflight findings](bedrock/README.md) record the current
+organization-policy blocker. Execution readiness is separate from plan approval.
 
 **Legacy scaffolding below:** the local likelihood runner and `configs/pilot.json`
 do not implement the Bedrock proposal. The config remains disabled. The older

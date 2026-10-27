@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "direction_approved": true,
+  "approval_scope": "User approved Bedrock v0.2 direction and proceeding to next step; preflight required before bounded smoke.",
+  "execution_ready": false,
+  "blockers": [
+    "Organization service control policy explicitly denies bedrock:ListKnowledgeBases in us-west-2.",
+    "Smoke runner, complete cost reservations, and service setup remain to be implemented/validated."
+  ],
+  "region": "us-west-2",
+  "model_id": "mistral.ministral-3-3b-instruct",
+  "protocol": "generated-answer-multiple-choice-v1",
+  "arms": [
+    "N0",
+    "H3",
+    "MQHR3"
+  ],
+  "budget": {
+    "project_ceiling_usd": 200,
+    "pilot_ceiling_usd": 20
+  },
+  "status": "preflight_blocked",
+  "note": "Planning record only; not consumed by the legacy likelihood runner."
+}

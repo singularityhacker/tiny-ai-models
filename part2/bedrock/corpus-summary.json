@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "snapshot": "20220301.simple",
+  "seed": 20261026,
+  "source_articles": 205328,
+  "sample_articles": 1000,
+  "purpose": "Ingestion/retrieval plumbing smoke test; not a corpus coverage study",
+  "source_bytes": 1141946,
+  "source_arrow_sha256": "2e1da592ea267ab60567aae54b610163bd86ef893b869f8bc82af664e6b12368",
+  "full_export_estimated_bytes": 250489331,
+  "full_export_storage_usd_per_month_at_5_per_gb": 1.252446655,
+  "sample_storage_usd_per_month_at_5_per_gb": 0.00570973
+}
