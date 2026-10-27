@@ -1,16 +1,22 @@
 # Tiny Models, Part II — bounded pilot
 
-**Latest proposal:** [Public blueprint](blueprint/README.md) proposes a <=5 GB
-roster and AWS design for approval. It supersedes the tentative roster below;
-the starter `configs/pilot.json` is intentionally not changed into an approved
-execution configuration. No experiments may run before explicit approval.
+**Latest proposal:** [Bedrock blueprint v0.2](blueprint/README.md) proposes
+Ministral 3 3B, managed Knowledge Bases and Bedrock Evaluations. Part II uses a
+new generated-answer protocol, with no direct comparison claim against Part I.
+Only one size-qualified candidate has been found; review must resolve whether
+to start with one or wait for a second. No experiments may run before approval.
+
+**Legacy scaffolding below:** the local likelihood runner and `configs/pilot.json`
+do not implement the Bedrock proposal. The config remains disabled. The older
+scope and next steps below are historical implementation notes, superseded by
+the v0.2 blueprint; do not use them as execution authorization.
 
 The experiment tools remain independent of the published 2025 dashboard.
 The authorized blueprint publication adds a link and a separate `/part-ii/`
 page through the existing build script; historical results stay unchanged.
 The experiment commands below create no cloud resources or public release.
 
-## Scope agreed for the pilot
+## Previous pilot scope (superseded)
 
 - MMLU and HellaSwag, using lm-eval likelihood scoring. Keep HellaSwag raw
   accuracy and length-normalized accuracy separate.
@@ -113,7 +119,7 @@ aggregates; replay requires original item-level evidence. Part II subsets,
 zero-shot settings and new harness/data versions must not be described as an
 exact reproduction of the original full run.
 
-## Next gates
+## Previous implementation gates (superseded)
 
 1. Resolve the AWS account/profile and region. Select and pin the two new models.
 2. Lock dependencies, prepare the panel, and complete a tiny local smoke run.

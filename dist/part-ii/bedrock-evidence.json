@@ -1,0 +1,132 @@
+{
+  "version": 2,
+  "checked_at": "2026-10-26",
+  "status": "proposal_not_approved",
+  "region": "us-west-2",
+  "catalog_source": "aws bedrock list-foundation-models",
+  "catalog_scope": "Regional runtime catalog plus AWS model cards; not an exhaustive worldwide or Marketplace inventory. No inference invoked.",
+  "catalog_entries": [
+    {
+      "modelId": "mistral.voxtral-mini-3b-2507",
+      "modelName": "Voxtral Mini 3B 2507",
+      "inputModalities": [
+        "SPEECH",
+        "TEXT"
+      ],
+      "outputModalities": [
+        "TEXT"
+      ],
+      "inferenceTypesSupported": [
+        "ON_DEMAND"
+      ],
+      "modelLifecycle": {
+        "status": "ACTIVE",
+        "startOfLifeTime": "2025-12-02T00:00:00+00:00"
+      }
+    },
+    {
+      "modelId": "google.gemma-3-4b-it",
+      "modelName": "Gemma 3 4B IT",
+      "inputModalities": [
+        "TEXT",
+        "IMAGE"
+      ],
+      "outputModalities": [
+        "TEXT"
+      ],
+      "inferenceTypesSupported": [
+        "ON_DEMAND"
+      ],
+      "modelLifecycle": {
+        "status": "ACTIVE",
+        "startOfLifeTime": "2025-12-02T00:00:00+00:00"
+      }
+    },
+    {
+      "modelId": "mistral.ministral-3-3b-instruct",
+      "modelName": "Ministral 3B",
+      "inputModalities": [
+        "TEXT",
+        "IMAGE"
+      ],
+      "outputModalities": [
+        "TEXT"
+      ],
+      "inferenceTypesSupported": [
+        "ON_DEMAND"
+      ],
+      "modelLifecycle": {
+        "status": "ACTIVE",
+        "startOfLifeTime": "2025-12-02T00:00:00+00:00"
+      }
+    },
+    {
+      "modelId": "amazon.nova-micro-v1:0",
+      "modelName": "Nova Micro",
+      "inputModalities": [
+        "TEXT"
+      ],
+      "outputModalities": [
+        "TEXT"
+      ],
+      "inferenceTypesSupported": [
+        "INFERENCE_PROFILE"
+      ],
+      "modelLifecycle": {
+        "status": "ACTIVE",
+        "startOfLifeTime": "2024-12-03T08:00:00+00:00"
+      }
+    }
+  ],
+  "primary_candidate": {
+    "model_id": "mistral.ministral-3-3b-instruct",
+    "publisher": "mistralai/Ministral-3-3B-Instruct-2512",
+    "revision": "b35d4dfe56c142746f54dbd64f579faab2744308",
+    "selected_artifact": {
+      "rfilename": "model.safetensors",
+      "size": 4672099184
+    },
+    "weight_bytes": 4672099184,
+    "precision": "Publisher FP8 checkpoint with BF16 tensors; Bedrock serving precision undisclosed",
+    "parameters": "Publisher: 3.4B language + 0.4B vision; total approximately 3.8B",
+    "license": "Apache-2.0",
+    "access": "Catalog-listed ACTIVE / ON_DEMAND. Entitlement query failed on credential refresh; invocation intentionally not tested.",
+    "size_interpretation": "Portable publisher weight artifact under 5 GB, not a measurement of AWS runtime memory or proof of identical serving weights."
+  },
+  "prices": {
+    "source": "https://aws.amazon.com/bedrock/pricing/",
+    "region": "us-west-2",
+    "currency": "USD",
+    "ministral_input_per_million": 0.1,
+    "ministral_output_per_million": 0.1,
+    "managed_kb_raw_gb_month": 5,
+    "managed_kb_retrieve_per_thousand": 1,
+    "cohere_rerank_queries_per_thousand": 2
+  },
+  "illustration": {
+    "questions": 214,
+    "models": 1,
+    "arms": 3,
+    "answers": 642,
+    "retrieval_calls": 1070,
+    "generation_input_tokens_per_answer_assumed": 2000,
+    "generation_output_tokens_per_answer_assumed": 16,
+    "generation_usd": 0.12942720000000002,
+    "storage_one_gb_one_month_usd": 5,
+    "retrieve_usd": 1.07,
+    "rerank_214_queries_usd": 0.428,
+    "subtotal_usd": 6.6274272000000005,
+    "excluded": "Rewrites, judge prompts/outputs, S3, logs, retries, taxes, corpus growth and optional extra studies; not a campaign quote."
+  },
+  "sources": [
+    "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-mistral-ai-ministral-3b.html",
+    "https://huggingface.co/mistralai/Ministral-3-3B-Instruct-2512",
+    "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-meta-llama-3-2-1b-instruct.html",
+    "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-meta-llama-3-2-3b-instruct.html",
+    "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-google-gemma-4-e2b.html",
+    "https://docs.aws.amazon.com/bedrock/latest/userguide/kb-test-retrieve.html",
+    "https://docs.aws.amazon.com/bedrock/latest/userguide/evaluation-kb.html",
+    "https://docs.aws.amazon.com/bedrock/latest/userguide/evaluation-judge.html",
+    "https://aws.amazon.com/bedrock/pricing/"
+  ]
+}

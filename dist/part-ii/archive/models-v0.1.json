@@ -1,0 +1,230 @@
+{
+  "checked_at": "2026-10-26",
+  "status": "proposal_not_approved",
+  "unit": "decimal GB; sum of root safetensors files, excluding tokenizer/config/runtime memory",
+  "models": [
+    {
+      "id": "Qwen/Qwen3.5-0.8B-Base",
+      "revision": "dc7cdfe2ee4154fa7e30f5b51ca41bfa40174e68",
+      "source": "https://huggingface.co/Qwen/Qwen3.5-0.8B-Base",
+      "license": "apache-2.0",
+      "safetensors_parameters": {
+        "parameters": {
+          "F32": 2592,
+          "BF16": 873436192
+        },
+        "total": 873438784
+      },
+      "weight_files": [
+        {
+          "path": "model.safetensors-00001-of-00001.safetensors",
+          "bytes": 1746942600
+        }
+      ],
+      "weight_bytes": 1746942600
+    },
+    {
+      "id": "Qwen/Qwen3.5-2B-Base",
+      "revision": "b1485b2fa6dfa1287294f269f5fb618e03d52d7c",
+      "source": "https://huggingface.co/Qwen/Qwen3.5-2B-Base",
+      "license": "apache-2.0",
+      "safetensors_parameters": {
+        "parameters": {
+          "F32": 2592,
+          "BF16": 2274067232
+        },
+        "total": 2274069824
+      },
+      "weight_files": [
+        {
+          "path": "model.safetensors-00001-of-00001.safetensors",
+          "bytes": 4548221488
+        }
+      ],
+      "weight_bytes": 4548221488
+    },
+    {
+      "id": "meta-llama/Llama-3.2-1B",
+      "revision": "4e20de362430cd3b72f300e6b0f18e50e7166e08",
+      "source": "https://huggingface.co/meta-llama/Llama-3.2-1B",
+      "license": "llama3.2",
+      "safetensors_parameters": {
+        "parameters": {
+          "BF16": 1235814400
+        },
+        "total": 1235814400
+      },
+      "weight_files": [
+        {
+          "path": "model.safetensors",
+          "bytes": 2471645608
+        }
+      ],
+      "weight_bytes": 2471645608
+    },
+    {
+      "id": "meta-llama/Llama-3.2-3B",
+      "revision": "13afe5124825b4f3751f836b40dafda64c1ed062",
+      "source": "https://huggingface.co/meta-llama/Llama-3.2-3B",
+      "license": "llama3.2",
+      "safetensors_parameters": {
+        "parameters": {
+          "BF16": 3212749824
+        },
+        "total": 3212749824
+      },
+      "weight_files": [
+        {
+          "path": "model-00001-of-00002.safetensors",
+          "bytes": 4965799096
+        },
+        {
+          "path": "model-00002-of-00002.safetensors",
+          "bytes": 1459729952
+        }
+      ],
+      "weight_bytes": 6425529048
+    },
+    {
+      "id": "Qwen/Qwen3.5-0.8B",
+      "revision": "2fc06364715b967f1860aea9cf38778875588b17",
+      "source": "https://huggingface.co/Qwen/Qwen3.5-0.8B",
+      "license": "apache-2.0",
+      "safetensors_parameters": {
+        "parameters": {
+          "F32": 2592,
+          "BF16": 873436192
+        },
+        "total": 873438784
+      },
+      "weight_files": [
+        {
+          "path": "model.safetensors-00001-of-00001.safetensors",
+          "bytes": 1746942600
+        }
+      ],
+      "weight_bytes": 1746942600
+    },
+    {
+      "id": "Qwen/Qwen3.5-2B",
+      "revision": "15852e8c16360a2fea060d615a32b45270f8a8fc",
+      "source": "https://huggingface.co/Qwen/Qwen3.5-2B",
+      "license": "apache-2.0",
+      "safetensors_parameters": {
+        "parameters": {
+          "F32": 2592,
+          "BF16": 2274067232
+        },
+        "total": 2274069824
+      },
+      "weight_files": [
+        {
+          "path": "model.safetensors-00001-of-00001.safetensors",
+          "bytes": 4548221488
+        }
+      ],
+      "weight_bytes": 4548221488
+    },
+    {
+      "id": "HuggingFaceTB/SmolLM3-3B",
+      "revision": "a07cc9a04f16550a088caea529712d1d335b0ac1",
+      "source": "https://huggingface.co/HuggingFaceTB/SmolLM3-3B",
+      "license": "apache-2.0",
+      "safetensors_parameters": {
+        "parameters": {
+          "BF16": 3075098624
+        },
+        "total": 3075098624
+      },
+      "weight_files": [
+        {
+          "path": "model-00001-of-00002.safetensors",
+          "bytes": 4966315264
+        },
+        {
+          "path": "model-00002-of-00002.safetensors",
+          "bytes": 1183919744
+        }
+      ],
+      "weight_bytes": 6150235008
+    },
+    {
+      "id": "google/gemma-3-1b-it",
+      "revision": "dcc83ea841ab6100d6b47a070329e1ba4cf78752",
+      "source": "https://huggingface.co/google/gemma-3-1b-it",
+      "license": "gemma",
+      "safetensors_parameters": {
+        "parameters": {
+          "BF16": 999885952
+        },
+        "total": 999885952
+      },
+      "weight_files": [
+        {
+          "path": "model.safetensors",
+          "bytes": 1999811208
+        }
+      ],
+      "weight_bytes": 1999811208
+    },
+    {
+      "id": "google/gemma-4-E2B-it",
+      "revision": "3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+      "source": "https://huggingface.co/google/gemma-4-E2B-it",
+      "license": "apache-2.0",
+      "safetensors_parameters": {
+        "parameters": {
+          "BF16": 5123178051
+        },
+        "total": 5123178051
+      },
+      "weight_files": [
+        {
+          "path": "model.safetensors",
+          "bytes": 10246621918
+        }
+      ],
+      "weight_bytes": 10246621918
+    },
+    {
+      "id": "sentence-transformers/all-mpnet-base-v2",
+      "revision": "e8c3b32edf5434bc2275fc9bab85f82640a19130",
+      "source": "https://huggingface.co/sentence-transformers/all-mpnet-base-v2",
+      "license": "apache-2.0",
+      "safetensors_parameters": {
+        "parameters": {
+          "I64": 514,
+          "F32": 109486464
+        },
+        "total": 109486978
+      },
+      "weight_files": [
+        {
+          "path": "model.safetensors",
+          "bytes": 437971872
+        }
+      ],
+      "weight_bytes": 437971872
+    },
+    {
+      "id": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+      "revision": "233902d25c440f23af6f7d6e94d2946bac0bee0a",
+      "source": "https://huggingface.co/cross-encoder/ms-marco-MiniLM-L-6-v2",
+      "license": "apache-2.0",
+      "safetensors_parameters": {
+        "parameters": {
+          "I64": 512,
+          "F32": 22713601
+        },
+        "total": 22714113
+      },
+      "weight_files": [
+        {
+          "path": "model.safetensors",
+          "bytes": 90870598
+        }
+      ],
+      "weight_bytes": 90870598
+    }
+  ]
+}
